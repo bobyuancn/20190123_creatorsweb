@@ -1,0 +1,24 @@
+{
+  "name": "20190123_creatorsweb",
+  "version": "1.0.0",
+  "description": "CreatorsWeb\r Software, programming, and other interesting things.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"docs:build": "vuepress build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bobyuancn/20190123_creatorsweb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bobyuancn/20190123_creatorsweb/issues"
+  },
+  "homepage": "https://github.com/bobyuancn/20190123_creatorsweb#readme",
+  "dependencies": {
+    "vuepress": "^0.14.8"
+  }
+}
