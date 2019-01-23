@@ -1,7 +1,7 @@
 ---
 title: VirtualBox
 date: 2019-01-21
-description: 使用 Oracle VirtualBox 的一些心得体会。包括：共享文件夹、网络连接方式、Portable-VirtualBox、增加磁盘空间、VirtualBox v6.0 等。
+description: 介绍 Oracle VirtualBox 的一些功能和使用。包括：共享文件夹、网络连接方式、Portable-VirtualBox、增加磁盘空间、VirtualBox v6.0 等。
 ---
 
 # VirtualBox
@@ -64,6 +64,7 @@ description: 使用 Oracle VirtualBox 的一些心得体会。包括：共享文
 ```shell
 # mount the CD image at first.
 
+# mount the CD-ROM.
 cd /mnt
 mkdir cdrom 
 mount /dev/cdrom /mnt/cdrom
@@ -83,7 +84,7 @@ reboot
 
 重启生效后，此共享文件夹将被挂载到“/media/sf_vmshare”，只有 root 用户才有权限访问。我们观察到此路径属于“vboxsf”组：
 
-```
+```shell
 bobyuan@ubuntuvm1:~$ ls -l /media
 total 8
 drwxrwx--- 1 root vboxsf 8192 Jan 15 08:21 sf_vmshare
@@ -91,7 +92,7 @@ drwxrwx--- 1 root vboxsf 8192 Jan 15 08:21 sf_vmshare
 
 为了让当前用户“bobyuan”能够访问此文件夹，需要将“bobyuan”也加入到“vboxsf”组内。
 
-```
+```shell
 # add user to group.
 sudo usermod -aG vboxsf bobyuan
 ```
@@ -181,5 +182,5 @@ sudo usermod -aG vboxsf bobyuan
 
 ## 结语
 
-以上是我使用 Oracle VirtualBox 的一些心得体会，您是怎样使用 VirtualBox 呢？如果您对本文有什么好的建议或意见，欢迎给我写电子邮件。
+以上介绍了 Oracle VirtualBox 的一些功能和使用，您是怎样使用 VirtualBox 呢？如果您对本文有什么好的建议或意见，欢迎给我写电子邮件。
 
