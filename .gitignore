@@ -76,4 +76,5 @@ typings/
 
 # ignore specific folder, the link (directory junctions).
 /blog/bobyuan/2019/img/
+/blog/emon/2019/img/
 
