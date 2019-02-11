@@ -73,8 +73,11 @@ mount /dev/cdrom /mnt/cdrom
 cd /mnt/cdrom
 ./VBoxLinuxAdditions.run
 
-# if everything is OK, reboot to complete the installation.
+# reboot to take effect.
 reboot
+
+# check the vboxadd-service status, it should be started.
+systemctl status vboxadd-service
 ```
 
 在本例中，虚拟机的共享文件夹是这样设置的。共享文件夹名称为“vmshare”，它是宿主机上的文件夹“D:\VirtualBox_VMs\vmshare”，勾择复选框“Auto-mount”和“Make Permanent”。
@@ -94,7 +97,8 @@ drwxrwx--- 1 root vboxsf 8192 Jan 15 08:21 sf_vmshare
 
 ```shell
 # add user to group.
-sudo usermod -aG vboxsf bobyuan
+sudo adduser bobyuan vboxsf
+# or: sudo usermod -aG vboxsf bobyuan
 ```
 
 重新登录后，通过“groups”命令检查一下，确保自己（即“bobyuan”用户）已经是“vboxsf”组的成员。至此，即可以顺利读写此共享文件夹了。
@@ -172,11 +176,15 @@ sudo usermod -aG vboxsf bobyuan
 
 * Added support for using Hyper-V as the fallback execution core  on Windows host, to avoid inability to run VMs at the price of reduced  performance In addition.
 
-不仅仅是界面上，性能上也将较前一版本 5.x 有较大改进。不到一个月后，v6.0.2 在 2019-1-15 日发布了，官方网页也将 v6.x 作为主推的版本。
+不仅仅是界面上，性能上也将较前一版本 5.x 有较大改进。官方网页也将 v6.x 作为主推的版本。
 
-一般情况下，新的大版本可能有较多不稳定因素，从更新日志也可以看出，新版本的更新总是有较多的缺陷修复记录。
+一般情况下，新的大版本可能有较多不稳定因素，从更新日志也可以看出，新版本的更新总是有较多的缺陷修复记录。从我目前的使用情况来看，新版的运行情况良好，常用的功能都还算稳定。界面有一些变化，但也很快适应了。
 
-从我目前的使用情况来看，新版的运行情况良好，界面有一些变化，但也很快适应了。
+有一点需要注意的是：
+
+新版的 VirtualBox v6.x 将“VMSVGA”设为默认值，而前版本 v5.x 的默认值是“VBoxVGA”。VMSVGA 是 VMware 的 SVGA II graphics adapter，如果不改为之前的 VBoxVGA，虚拟机将会显示一个较小的窗口。下面是设置使用“Graphics Controller”的对话框。
+
+![VirtualBox Graphics Controler](img/20190121/VirtualBox_GraphicsControler.png)
 
 
 
