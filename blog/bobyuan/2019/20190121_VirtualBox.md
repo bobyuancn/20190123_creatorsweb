@@ -39,8 +39,11 @@ description: 介绍 Oracle VirtualBox 的一些功能和使用。包括：共享
 
 ![Shared Folders](img/20190121/VirtualBox_SharedFolders_vmshare.png)
 
+本文将以 Windows 10 为宿主机，安装 VirtualBox 5.x，运行 Ubuntu 虚拟机为例（Windows 虚拟机将更简单），简要描述一下 VirtualBox 的几个实用功能，供读者参考。需要注意的是，新版本 VirtualBox 6.0 的界面和操作将稍有不同。
 
-本文将描述一下我使用 VirtualBox 的几个功能，供有同样兴趣的读者参考。
+希望深入了解 VirtualBox 的读者可以阅读官方用户手册（网址是： <https://www.virtualbox.org/manual/>）。
+
+
 
 
 [[toc]]
@@ -51,7 +54,9 @@ description: 介绍 Oracle VirtualBox 的一些功能和使用。包括：共享
 
 ## 共享文件夹
 
-如前所述，共享文件夹（Shared Folders）需要依赖于“Guest Additions”，因此必须在虚拟机上先安装它。安装步骤如下：
+如前所述，共享文件夹（Shared Folders）需要依赖于“Guest Additions”，因此必须在虚拟机上先安装它。官方用户手册的 [Chapter 4. Guest Additions](https://www.virtualbox.org/manual/ch04.html) 对此有详细描述。
+
+安装步骤如下：
 
 启动虚拟机，点选菜单“Devices | Insert Guest Additions CD image...”来将此 CD 镜像放到虚拟机的光驱里。
 
@@ -62,7 +67,7 @@ description: 介绍 Oracle VirtualBox 的一些功能和使用。包括：共享
 如果虚拟机是 Linux 操作系统，需要以 root 用户先挂载 CD-ROM 再安装。
 
 ```shell
-# mount the CD image at first.
+# remember to mount the CD image at first.
 
 # mount the CD-ROM.
 cd /mnt
@@ -75,17 +80,28 @@ cd /mnt/cdrom
 
 # reboot to take effect.
 reboot
-
-# check the vboxadd-service status, it should be started.
-systemctl status vboxadd-service
 ```
 
-在本例中，虚拟机的共享文件夹是这样设置的。共享文件夹名称为“vmshare”，它是宿主机上的文件夹“D:\VirtualBox_VMs\vmshare”，勾择复选框“Auto-mount”和“Make Permanent”。
+安装完成后，我们可以查看服务状态，还有安装的版本。
+
+```shell
+# check the vboxadd-service status, it should be started.
+systemctl status vboxadd-service
+
+# check the version installed.
+ls /opt | grep VBox
+```
+
+
+
+在本例中，虚拟机的共享文件夹是这样设置的：
+
+设置共享文件夹名称为“vmshare”，它是宿主机上的文件夹“D:\VirtualBox_VMs\vmshare”，选择复选框“Auto-mount”和“Make Permanent”。
 
 ![VirtualBox Shared Folders Setting](img/20190121/VirtualBox_SharedFolders_Settings.png)
 
 
-重启生效后，此共享文件夹将被挂载到“/media/sf_vmshare”，只有 root 用户才有权限访问。我们观察到此路径属于“vboxsf”组：
+重启生效后，此共享文件夹将被自动挂载到“/media/sf_vmshare”，只有 root 用户才有权限访问。经查看，此路径属于“vboxsf”组：
 
 ```shell
 bobyuan@ubuntuvm1:~$ ls -l /media
@@ -101,7 +117,21 @@ sudo adduser bobyuan vboxsf
 # or: sudo usermod -aG vboxsf bobyuan
 ```
 
-重新登录后，通过“groups”命令检查一下，确保自己（即“bobyuan”用户）已经是“vboxsf”组的成员。至此，即可以顺利读写此共享文件夹了。
+重新登录后，通过“groups”命令检查一下，确保当前用户已经是“vboxsf”组的成员，即可以顺利读写此共享文件夹了。
+
+在 VirtualBox 6.0 上，共享文件夹功能有所改变。如果共享文件夹没有自动挂载，可以用如下命令手动挂载。
+
+```shell
+# format:  mount -t vboxsf [-o OPTIONS] sharename mountpoint
+sudo mount -t vboxsf vmshare /media/sf_vmshare
+```
+
+若是想在系统启动时自动挂载，添加一条配置到 `/etc/fstab`：
+
+```shell
+# format:  sharename   mountpoint   vboxsf   defaults  0   0
+vmshare /media/sf_vmshare vboxsf defaults 0 0
+```
 
 
 
@@ -137,16 +167,16 @@ sudo adduser bobyuan vboxsf
 
 我经常是这样使用它的：
 
-1. Windows 宿主机事先已经安装了 VirtualBox，但不要启动安装的 VirtualBox 图形界面。将安装了 Portable-VirtualBox 的移动硬盘接上，在宿主机上“磁盘管理”中设置指定此移动硬盘使用“V”盘符（即VirtualBox的首字符，您也可以选择其它盘符），目的是锁定移动硬盘的盘符。这样上设置后，每次此移动硬盘接驳上后，将固定作为 V 盘访问。
+1. Windows 宿主机事先已经安装了 VirtualBox，但不要启动安装的 VirtualBox 图形界面。将安装了 Portable-VirtualBox 的移动硬盘接上，在宿主机上“磁盘管理”中设置指定此移动硬盘使用“V”盘符（即VirtualBox的首字符，您也可以选择其它盘符），目的是锁定移动硬盘的盘符。这样设置完成后，每次此移动硬盘接驳上，都将固定作为 V 盘访问。
 2. 在移动硬盘上启动 Portable-VirtualBox，稍等片刻等图形界面出现，在设置中配置虚拟机的存放位置，共享文件夹的位置等，保存这些设置。
-3. 在移动硬盘上启动 Portable-VirtualBox 的图形界面里使用虚拟机。
+3. 在移动硬盘上 Portable-VirtualBox 的图形界面里使用虚拟机。
 
 要退出使用时，需先关闭全部虚拟机，再关闭 Portable-VirtualBox 图形界面。最后弹出此移动硬盘。
 
-这种使用模式也有需要注意的地方：
+这种使用模式需要注意的地方：
 
-1. 保持宿主机上安装的 VirtualBox 和移动硬盘上安装的版本一致。如果宿主机升级了，也要保证所有移动硬盘上的安装升级到同样的版本。升级 VirtualBox 也同时会升级虚拟机里安装的 “Guest Additions”。
-2. 移动硬盘最好是高速接驳，例如 USB 3.0 或更高速的连接方式。还可以考虑使用固态的移动硬盘。
+1. 保持宿主机上安装的 VirtualBox 和移动硬盘上安装的版本一致。如果宿主机升级了，也要保证所有移动硬盘上的安装升级到同样的版本。升级 VirtualBox 也同时需要升级虚拟机里安装的 “Guest Additions”。
+2. 移动硬盘最好是高速接驳，例如 USB 3.0 或更高速的连接方式。如考虑使用固态的移动硬盘。
 3. 注意保持连接的稳定，不能在使用过程中中断，否则有可能导致整个虚拟机的存储文件损坏，造成数据丢失。
 
 鉴于上述第3点的风险，使用这种方式请谨慎。
@@ -176,13 +206,13 @@ sudo adduser bobyuan vboxsf
 
 * Added support for using Hyper-V as the fallback execution core  on Windows host, to avoid inability to run VMs at the price of reduced  performance In addition.
 
-不仅仅是界面上，性能上也将较前一版本 5.x 有较大改进。官方网页也将 v6.x 作为主推的版本。
+不仅仅是界面上，性能上也将较前一版本 5.x 有较大改进。官方网页已经将 v6.0 作为主推的版本。
 
 一般情况下，新的大版本可能有较多不稳定因素，从更新日志也可以看出，新版本的更新总是有较多的缺陷修复记录。从我目前的使用情况来看，新版的运行情况良好，常用的功能都还算稳定。界面有一些变化，但也很快适应了。
 
 有一点需要注意的是：
 
-新版的 VirtualBox v6.x 将“VMSVGA”设为默认值，而前版本 v5.x 的默认值是“VBoxVGA”。VMSVGA 是 VMware 的 SVGA II graphics adapter，如果不改为之前的 VBoxVGA，虚拟机将会显示一个较小的窗口。下面是设置使用“Graphics Controller”的对话框。
+新版的 VirtualBox v6.0 将“VMSVGA”设为默认值，而前版本 v5.x 的默认值是“VBoxVGA”。VMSVGA 是 VMware 的 SVGA II graphics adapter，如果不改为之前的 VBoxVGA，虚拟机将会显示一个较小的窗口。下面是设置使用“Graphics Controller”的对话框。
 
 ![VirtualBox Graphics Controler](img/20190121/VirtualBox_GraphicsControler.png)
 
